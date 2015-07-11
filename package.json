@@ -1,0 +1,14 @@
+{
+  "name": "node-mysql-proxy",
+  "version": "1.0.0",
+  "description": "Simple mysql proxy",
+  "author": "Eran Betzalel",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.13.2",
+    "connect": "^3.4.0",
+    "connect-timeout": "^1.6.2",
+    "mysql": "^2.7.0",
+    "request": "^2.58.0"
+  }
+}
