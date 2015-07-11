@@ -9,6 +9,6 @@
     "connect": "^3.4.0",
     "connect-timeout": "^1.6.2",
     "mysql": "^2.7.0",
-    "request": "^2.58.0"
+    "request-json": "^0.5.3"
   }
 }

@@ -1,6 +1,8 @@
 var assert = require('assert');
-var request = require('request');
+var request = require('request-json');
 var config = require('../config');
+
+var client = request.createClient('http://localhost:' + config.web.httpPort);
 
 describe('MySQL Proxy', function () {
     before(function () {
@@ -45,19 +47,54 @@ describe('MySQL Proxy', function () {
                 });
             });
         });
+
+        describe('Simple data operations', function () {
+            var testDatabaseName = 'test_' + Date.now();
+
+            before(function (done) {
+                executeRemoteSql('CREATE DATABASE ' + testDatabaseName, null, function (err, rows, fields) {
+                    assert.equal(err, null);
+
+                    done();
+                });
+            });
+
+            it('should be able to create a database, table and insert some data', function (done) {
+                var tableName = testDatabaseName + '.test';
+
+                executeRemoteSql('CREATE TABLE ' + tableName + ' (testColumn VARCHAR(50))', null, function (err, rows, fields) {
+                    assert.equal(err, null);
+
+                    executeRemoteSql('INSERT INTO ' + tableName + ' (testColumn) VALUES (?)', ['some data'], function (err, rows, fields) {
+                        assert.equal(err, null);
+
+                        executeRemoteSql('SELECT * FROM ' + tableName, null, function (err, rows, fields) {
+                            assert.equal(err, null);
+                            assert.notEqual(rows, null);
+                            assert.equal(rows[0].testColumn, 'some data');
+
+                            done();
+                        });
+                    });
+                });
+            });
+
+            after(function (done) {
+                executeRemoteSql('DROP DATABASE ' + testDatabaseName, null, function (err, rows, fields) {
+                    assert.equal(err, null);
+
+                    done();
+                });
+            })
+        });
     });
 });
 
 function executeRemoteSql(query, params, callback) {
-    request
-        .post({
-            url: 'http://localhost:' + config.web.httpPort,
-            form: {query: query, params: params}
-        }, function (err, res, body) {
+    client.post('', {query: query, params: params},
+        function (err, res, body) {
             assert.equal(err, null);
 
-            var result = JSON.parse(body);
-
-            callback(result.error, result.rows, result.fields);
+            callback(body.error, body.rows, body.fields);
         });
 }

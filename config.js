@@ -1,7 +1,8 @@
 var config = {
     web: {
         httpPort: 8080 || process.env.MYSQL_PROXY_HTTP,
-        responseTimeout: 60 * 1000
+        responseTimeout: 60 * 1000,
+        allowRequestOrigin: '*'
     },
     mysqlPool: {
         connectionLimit: 10,
